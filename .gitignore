@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (¡NUNCA subir al repo!)
+.env
+
+# Base de datos local (Railway usa /tmp por defecto)
+data/apprc.db
+data/apprc.db-wal
+data/apprc.db-shm
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Logs de correo (se regeneran)
+data/email_log_*.json
+
+# Accesos (se regeneran al importar)
+data/accesos_supervisores.txt
+
+# Uploads generados en producción
+uploads/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+*.log

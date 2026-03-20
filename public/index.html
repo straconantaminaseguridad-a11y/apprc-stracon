@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a5276">
+<title>AppRC · STRACON SSOMA</title>
+<style>
+/* ─── RESET & BASE ─────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1a1a2e}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit}
+
+/* ─── VARIABLES ────────────────────────────────── */
+:root{
+  --primary:#1a5276;
+  --primary-dark:#154360;
+  --primary-light:#2980b9;
+  --accent:#e67e22;
+  --accent-dark:#d35400;
+  --success:#27ae60;
+  --success-bg:#d5f5e3;
+  --danger:#e74c3c;
+  --danger-bg:#fdedec;
+  --warn:#f39c12;
+  --warn-bg:#fef9e7;
+  --na:#7f8c8d;
+  --na-bg:#ecf0f1;
+  --white:#ffffff;
+  --gray1:#f8f9fa;
+  --gray2:#e9ecef;
+  --gray3:#dee2e6;
+  --gray4:#adb5bd;
+  --text-dark:#1a1a2e;
+  --text-med:#555;
+  --text-light:#888;
+  --radius:12px;
+  --radius-sm:8px;
+  --shadow:0 2px 12px rgba(0,0,0,0.1);
+  --shadow-lg:0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* ─── APP SHELL ────────────────────────────────── */
+#app{
+  max-width:480px;
+  min-height:100vh;
+  margin:0 auto;
+  background:var(--white);
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  box-shadow:var(--shadow-lg);
+}
+
+/* ─── HEADER BAR ───────────────────────────────── */
+.app-header{
+  background:linear-gradient(135deg,var(--primary-dark),var(--primary));
+  color:var(--white);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  position:sticky;
+  top:0;
+  z-index:100;
+  min-height:56px;
+}
+.app-header .back-btn{
+  background:rgba(255,255,255,0.15);
+  border:none;
+  color:var(--white);
+  width:36px;height:36px;
+  border-radius:50%;
+  font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.app-header .back-btn:hover{background:rgba(255,255,255,0.25)}
+.app-header .title-block{flex:1;min-width:0}
+.app-header h1{font-size:16px;font-weight:700;line-height:1.2}
+.app-header .subtitle{font-size:11px;opacity:.8}
+.header-logo{
+  width:36px;height:36px;
+  background:rgba(255,255,255,0.15);
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+  flex-shrink:0;
+}
+
+/* ─── PROGRESS BAR ─────────────────────────────── */
+.progress-bar{
+  height:4px;
+  background:rgba(255,255,255,0.2);
+  position:relative;
+}
+.progress-fill{
+  height:100%;
+  background:var(--accent);
+  transition:width .4s ease;
+}
+
+/* ─── SCREEN CONTAINERS ────────────────────────── */
+.screen{display:none;flex:1;flex-direction:column;overflow:hidden}
+.screen.active{display:flex}
+.screen-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+
+/* ─── CARDS ────────────────────────────────────── */
+.card{
+  background:var(--white);
+  border:1px solid var(--gray3);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+}
+.card-title{
+  font-size:13px;
+  font-weight:700;
+  color:var(--primary);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+/* ─── FORM ELEMENTS ────────────────────────────── */
+.form-group{margin-bottom:14px}
+.form-label{
+  display:block;
+  font-size:12px;
+  font-weight:600;
+  color:var(--text-med);
+  margin-bottom:5px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+.form-control{
+  width:100%;
+  padding:10px 12px;
+  border:1.5px solid var(--gray3);
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  color:var(--text-dark);
+  background:var(--white);
+  transition:border-color .2s;
+  -webkit-appearance:none;
+}
+.form-control:focus{outline:none;border-color:var(--primary-light);box-shadow:0 0 0 3px rgba(41,128,185,.15)}
+.form-control[readonly]{background:var(--gray1);color:var(--text-med)}
+textarea.form-control{resize:vertical;min-height:72px}
+select.form-control{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M6 8L0 0h12z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+/* ─── BUTTONS ──────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:11px 20px;
+  border:none;
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  font-weight:600;
+  transition:all .2s;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:var(--white)}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-accent{background:var(--accent);color:var(--white)}
+.btn-accent:hover{background:var(--accent-dark)}
+.btn-success{background:var(--success);color:var(--white)}
+.btn-outline{background:var(--white);color:var(--primary);border:1.5px solid var(--primary)}
+.btn-outline:hover{background:var(--primary);color:var(--white)}
+.btn-danger{background:var(--danger);color:var(--white)}
+.btn-gray{background:var(--gray2);color:var(--text-med)}
+.btn-sm{padding:7px 13px;font-size:12px;border-radius:6px}
+.btn-block{width:100%}
+.btn:disabled{opacity:.5;pointer-events:none}
+
+/* ─── BOTTOM ACTION ────────────────────────────── */
+.bottom-action{
+  padding:14px 16px;
+  background:var(--white);
+  border-top:1px solid var(--gray3);
+  position:sticky;
+  bottom:0;
+}
+
+/* ─── LOGIN SCREEN ─────────────────────────────── */
+#screen-login .login-hero{
+  background:linear-gradient(160deg,var(--primary-dark),var(--primary-light));
+  padding:40px 24px 30px;
+  text-align:center;
+  color:var(--white);
+}
+#screen-login .login-icon{
+  width:70px;height:70px;
+  background:rgba(255,255,255,0.15);
+  border-radius:20px;
+  margin:0 auto 16px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;
+}
+#screen-login .login-title{font-size:24px;font-weight:800;margin-bottom:4px}
+#screen-login .login-sub{font-size:13px;opacity:.85}
+#screen-login .login-form{padding:24px 20px}
+.login-err{
+  background:var(--danger-bg);
+  color:var(--danger);
+  border:1px solid #f5b7b1;
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  font-size:13px;
+  margin-bottom:14px;
+  display:none;
+}
+
+/* ─── RC LIST ──────────────────────────────────── */
+.rc-search-box{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+.rc-search-box input{flex:1}
+.rc-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border:1.5px solid var(--gray3);
+  border-radius:var(--radius-sm);
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all .15s;
+  background:var(--white);
+}
+.rc-item:hover,.rc-item:active{border-color:var(--primary);background:#eaf2ff}
+.rc-badge{
+  min-width:44px;
+  height:44px;
+  background:var(--primary);
+  color:var(--white);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;
+  text-align:center;
+  line-height:1.2;
+  flex-shrink:0;
+}
+.rc-item-name{font-size:13px;font-weight:600;color:var(--text-dark);line-height:1.3}
+
+/* ─── SUBPOINTS ────────────────────────────────── */
+.category-block{
+  margin-bottom:16px;
+  border:1px solid var(--gray3);
+  border-radius:var(--radius);
+  overflow:hidden;
+}
+.category-header{
+  background:var(--primary);
+  color:var(--white);
+  padding:10px 14px;
+  font-size:13px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.cat-num{
+  background:rgba(255,255,255,0.2);
+  padding:2px 7px;
+  border-radius:5px;
+  font-size:12px;
+  font-weight:800;
+}
+.subpunto-row{
+  padding:12px 14px;
+  border-bottom:1px solid var(--gray2);
+  background:var(--white);
+}
+.subpunto-row:last-child{border-bottom:none}
+.sp-header{
+  display:flex;
+  gap:8px;
+  margin-bottom:8px;
+}
+.sp-num{
+  font-size:12px;
+  font-weight:700;
+  color:var(--primary);
+  min-width:32px;
+  margin-top:1px;
+}
+.sp-desc{font-size:13px;color:var(--text-dark);line-height:1.4;flex:1}
+.sp-required-badge{
+  font-size:10px;
+  color:var(--danger);
+  font-weight:700;
+  white-space:nowrap;
+  margin-left:auto;
+  padding:2px 6px;
+  background:var(--danger-bg);
+  border-radius:4px;
+  flex-shrink:0;
+}
+.sp-buttons{
+  display:flex;
+  gap:6px;
+  margin-bottom:8px;
+}
+.sp-btn{
+  flex:1;
+  padding:8px 4px;
+  border-radius:6px;
+  border:1.5px solid var(--gray3);
+  font-size:12px;
+  font-weight:700;
+  background:var(--gray1);
+  color:var(--text-med);
+  transition:all .15s;
+}
+.sp-btn.active-si{background:var(--success-bg);border-color:var(--success);color:var(--success)}
+.sp-btn.active-no{background:var(--danger-bg);border-color:var(--danger);color:var(--danger)}
+.sp-btn.active-na{background:var(--na-bg);border-color:var(--na);color:var(--na)}
+.sp-details{display:none;padding:8px 0 4px}
+.sp-details.visible{display:block}
+.sp-foto-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:7px 10px;
+  border:1.5px dashed var(--primary-light);
+  border-radius:6px;
+  background:var(--gray1);
+  color:var(--primary);
+  font-size:12px;
+  font-weight:600;
+  cursor:pointer;
+  margin-top:6px;
+  width:100%;
+  justify-content:center;
+}
+.sp-foto-btn.has-photo{border-style:solid;border-color:var(--success);background:var(--success-bg);color:var(--success)}
+.sp-foto-thumb{
+  width:100%;
+  max-height:140px;
+  object-fit:cover;
+  border-radius:6px;
+  margin-top:6px;
+  display:none;
+}
+
+/* ─── STATUS BADGE ─────────────────────────────── */
+.status-dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  display:inline-block;
+}
+.sp-status{font-size:11px;color:var(--text-light);margin-top:2px}
+
+/* ─── WORKERS ──────────────────────────────────── */
+.worker-search-box{
+  display:flex;gap:8px;margin-bottom:12px;
+}
+.worker-search-box input{flex:1}
+.worker-results{max-height:240px;overflow-y:auto;border:1px solid var(--gray3);border-radius:var(--radius-sm);margin-bottom:12px;display:none}
+.worker-result-item{
+  padding:10px 12px;
+  border-bottom:1px solid var(--gray2);
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13px;
+}
+.worker-result-item:last-child{border-bottom:none}
+.worker-result-item:hover{background:var(--gray1)}
+.worker-result-item .w-name{font-weight:600}
+.worker-result-item .w-info{font-size:11px;color:var(--text-light)}
+.worker-list{margin-top:4px}
+.worker-chip{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 12px;
+  background:var(--gray1);
+  border:1px solid var(--gray3);
+  border-radius:var(--radius-sm);
+  margin-bottom:6px;
+}
+.worker-chip .wc-name{font-size:13px;font-weight:600}
+.worker-chip .wc-info{font-size:11px;color:var(--text-light)}
+.worker-chip .wc-remove{
+  background:var(--danger-bg);
+  color:var(--danger);
+  border:none;
+  width:26px;height:26px;
+  border-radius:50%;
+  font-size:14px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.worker-count-badge{
+  display:inline-block;
+  background:var(--primary);
+  color:var(--white);
+  font-size:12px;
+  font-weight:700;
+  padding:2px 8px;
+  border-radius:20px;
+  margin-left:6px;
+}
+
+/* ─── SIGNATURE SCREEN ─────────────────────────── */
+.supervisor-card{
+  background:linear-gradient(135deg,#eaf2ff,#d6eaf8);
+  border:1.5px solid var(--primary-light);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:14px;
+}
+.supervisor-card .sv-name{font-size:16px;font-weight:700;color:var(--primary)}
+.supervisor-card .sv-info{font-size:12px;color:var(--text-med);margin-top:2px}
+.sig-canvas-wrap{
+  border:2px dashed var(--primary-light);
+  border-radius:var(--radius-sm);
+  background:var(--gray1);
+  position:relative;
+  overflow:hidden;
+}
+#sig-canvas{
+  display:block;
+  width:100%;
+  touch-action:none;
+  cursor:crosshair;
+}
+.sig-hint{
+  position:absolute;
+  inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;
+  color:var(--gray4);
+  pointer-events:none;
+  transition:opacity .3s;
+}
+.sig-clear-btn{
+  position:absolute;
+  top:8px;right:8px;
+  background:rgba(0,0,0,.1);
+  border:none;
+  color:#666;
+  font-size:12px;
+  padding:4px 8px;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+/* ─── CONFIRMATION SCREEN ──────────────────────── */
+.confirm-hero{
+  background:linear-gradient(135deg,var(--success),#1e8449);
+  color:var(--white);
+  text-align:center;
+  padding:32px 20px 24px;
+}
+.confirm-icon{font-size:52px;margin-bottom:12px}
+.confirm-title{font-size:22px;font-weight:800;margin-bottom:4px}
+.confirm-sub{font-size:13px;opacity:.85}
+.email-chip{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;
+  background:var(--gray1);
+  border-radius:var(--radius-sm);
+  border:1px solid var(--gray3);
+  margin-bottom:6px;
+  font-size:13px;
+}
+.email-chip .em-icon{font-size:18px;flex-shrink:0}
+.email-chip .em-name{font-weight:600}
+.email-chip .em-addr{font-size:11px;color:var(--text-light)}
+.folder-chip{
+  background:#fff8e1;
+  border:1px solid #f9ca24;
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  font-family:monospace;
+  font-size:12px;
+  color:#5d4e37;
+  word-break:break-all;
+  margin-bottom:6px;
+}
+
+/* ─── SPINNER ──────────────────────────────────── */
+.spinner-wrap{
+  position:fixed;inset:0;
+  background:rgba(255,255,255,.8);
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  z-index:9999;
+  display:none;
+}
+.spinner-wrap.visible{display:flex}
+.spinner{
+  width:44px;height:44px;
+  border:4px solid var(--gray3);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-label{margin-top:12px;font-size:14px;color:var(--text-med)}
+
+/* ─── TOAST ────────────────────────────────────── */
+.toast{
+  position:fixed;
+  bottom:80px;left:50%;
+  transform:translateX(-50%) translateY(20px);
+  background:#2c3e50;
+  color:#fff;
+  padding:10px 18px;
+  border-radius:20px;
+  font-size:13px;
+  white-space:nowrap;
+  opacity:0;
+  transition:all .3s;
+  z-index:9998;
+  max-width:90vw;
+  text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--success)}
+.toast.error{background:var(--danger)}
+.toast.warn{background:var(--warn);color:#333}
+
+/* ─── SUMMARY BAR ──────────────────────────────── */
+.summary-bar{
+  background:var(--gray1);
+  border:1px solid var(--gray3);
+  border-radius:var(--radius-sm);
+  padding:10px 12px;
+  margin-bottom:12px;
+  font-size:12px;
+  color:var(--text-med);
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.summary-item{display:flex;align-items:center;gap:4px}
+.summary-item strong{color:var(--text-dark)}
+
+/* ─── MISC ─────────────────────────────────────── */
+.divider{height:1px;background:var(--gray2);margin:14px 0}
+.badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:11px;font-weight:700}
+.badge-primary{background:var(--primary);color:var(--white)}
+.badge-warn{background:var(--warn-bg);color:#856404;border:1px solid #ffc107}
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-light)}
+.empty-state .es-icon{font-size:40px;margin-bottom:8px}
+.empty-state p{font-size:13px}
+.required-note{font-size:11px;color:var(--danger);margin-bottom:8px}
+
+/* ─── RC PROGRESS SUMMARY ──────────────────────── */
+.rc-eval-summary{
+  display:flex;gap:8px;flex-wrap:wrap;
+  padding:10px 14px;
+  background:var(--gray1);
+  border-bottom:1px solid var(--gray3);
+}
+.eval-pill{
+  font-size:11px;
+  font-weight:700;
+  padding:3px 10px;
+  border-radius:12px;
+  display:flex;align-items:center;gap:4px;
+}
+.eval-pill.si{background:var(--success-bg);color:var(--success)}
+.eval-pill.no{background:var(--danger-bg);color:var(--danger)}
+.eval-pill.na{background:var(--na-bg);color:var(--na)}
+.eval-pill.pend{background:#fff3e0;color:#e65100}
+
+/* ─── CAMERA MODAL ─────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:9990;
+  display:none;
+  flex-direction:column;
+}
+.modal-overlay.visible{display:flex}
+.modal-inner{
+  background:var(--white);
+  border-radius:var(--radius) var(--radius) 0 0;
+  margin-top:auto;
+  padding:16px;
+  max-height:85vh;
+  overflow-y:auto;
+}
+.modal-title{
+  font-size:15px;font-weight:700;
+  margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.modal-close{
+  background:var(--gray2);
+  border:none;
+  width:28px;height:28px;
+  border-radius:50%;
+  font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+#cam-video{
+  width:100%;
+  border-radius:var(--radius-sm);
+  background:#000;
+  display:block;
+  max-height:50vh;
+  object-fit:cover;
+}
+#cam-canvas{display:none}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════ SCREEN 1: LOGIN ═══════════════════ -->
+  <div id="screen-login" class="screen">
+    <div class="login-hero">
+      <div class="login-icon">🛡️</div>
+      <div class="login-title">AppRC</div>
+      <div class="login-sub">Sistema de Verificación de Riesgos Críticos<br>STRACON · SSOMA</div>
+    </div>
+    <div class="login-form">
+      <div id="login-err" class="login-err">⚠️ <span id="login-err-msg">Error</span></div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico</label>
+        <input id="login-email" type="email" class="form-control" placeholder="usuario@stracon.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña (DNI)</label>
+        <input id="login-pass" type="password" class="form-control" placeholder="Ingrese su DNI" autocomplete="current-password">
+      </div>
+      <button id="btn-login" class="btn btn-primary btn-block" style="margin-top:8px">
+        🔐 Ingresar
+      </button>
+      <p style="text-align:center;font-size:11px;color:var(--text-light);margin-top:16px">
+        Contraseña inicial: su número de DNI<br>
+        Contacte a SSOMA para soporte
+      </p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 2: CABECERA ═══════════════════ -->
+  <div id="screen-header" class="screen">
+    <div class="app-header">
+      <div class="title-block">
+        <h1>Nuevo Registro RC</h1>
+        <div class="subtitle">Paso 1 de 5 · Datos Generales</div>
+      </div>
+      <button class="btn btn-sm btn-gray" id="btn-logout" title="Cerrar sesión">Salir</button>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:20%"></div></div>
+    <div class="screen-body">
+      <div class="card">
+        <div class="card-title">📋 Información del Registro</div>
+        <div class="form-group">
+          <label class="form-label">Inspector / Inspector de SSOMA ✱</label>
+          <input id="hdr-inspector" type="text" class="form-control" readonly placeholder="Cargando...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Gerencia / Área ✱</label>
+          <select id="hdr-gerencia" class="form-control">
+            <option value="">Seleccione gerencia...</option>
+            <option value="Construcción">Construcción</option>
+            <option value="Operaciones Mina">Operaciones Mina</option>
+            <option value="Mantenimiento">Mantenimiento</option>
+            <option value="SSOMA">SSOMA</option>
+            <option value="Planta">Planta</option>
+            <option value="Logística">Logística</option>
+            <option value="Administración">Administración</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Lugar / Ubicación ✱</label>
+          <input id="hdr-lugar" type="text" class="form-control" placeholder="Ej: Galería 4200, Tajo Norte...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tarea / Actividad Evaluada ✱</label>
+          <textarea id="hdr-tarea" class="form-control" rows="2" placeholder="Describa la tarea o actividad que se está verificando..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Fecha de Registro</label>
+          <input id="hdr-fecha" type="date" class="form-control">
+        </div>
+      </div>
+      <p class="required-note">✱ Campo obligatorio</p>
+    </div>
+    <div class="bottom-action">
+      <button id="btn-hdr-next" class="btn btn-accent btn-block">
+        Seleccionar Riesgo Crítico →
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 3: SELECCIÓN RC ═══════════════════ -->
+  <div id="screen-rc" class="screen">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-header')">←</button>
+      <div class="title-block">
+        <h1>Seleccionar RC</h1>
+        <div class="subtitle">Paso 2 de 5 · Riesgo Crítico</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:40%"></div></div>
+    <div class="screen-body">
+      <div class="rc-search-box">
+        <input id="rc-search" type="search" class="form-control" placeholder="🔍 Buscar RC por código o nombre...">
+      </div>
+      <div id="rc-list"></div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 4: EVALUACIÓN SUBPUNTOS ═══════════════════ -->
+  <div id="screen-eval" class="screen">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-rc')">←</button>
+      <div class="title-block">
+        <h1 id="eval-rc-title">Evaluación RC</h1>
+        <div class="subtitle">Paso 3 de 5 · Verificación</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div>
+    <div id="eval-summary" class="rc-eval-summary"></div>
+    <div class="screen-body" id="eval-body">
+      <!-- Subpuntos generados dinámicamente -->
+    </div>
+    <div class="bottom-action">
+      <button id="btn-eval-next" class="btn btn-accent btn-block">
+        Registrar Trabajadores →
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 5: TRABAJADORES ═══════════════════ -->
+  <div id="screen-workers" class="screen">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-eval')">←</button>
+      <div class="title-block">
+        <h1>Trabajadores</h1>
+        <div class="subtitle">Paso 4 de 5 · Personal Involucrado</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+    <div class="screen-body">
+      <div class="card">
+        <div class="card-title">
+          👷 Personal Involucrado
+          <span class="worker-count-badge" id="worker-count">0</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-med);margin-bottom:12px">
+          Mínimo 1 trabajador. Busque por nombre o DNI.
+        </p>
+        <div class="worker-search-box">
+          <input id="worker-search" type="search" class="form-control" placeholder="🔍 Buscar por nombre o DNI...">
+          <button id="btn-worker-search" class="btn btn-outline btn-sm">Buscar</button>
+        </div>
+        <div id="worker-results" class="worker-results"></div>
+        <div id="worker-list" class="worker-list"></div>
+      </div>
+    </div>
+    <div class="bottom-action">
+      <button id="btn-workers-next" class="btn btn-accent btn-block">
+        Firma y Confirmación →
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 6: FIRMA ═══════════════════ -->
+  <div id="screen-sign" class="screen">
+    <div class="app-header">
+      <button class="back-btn" onclick="goTo('screen-workers')">←</button>
+      <div class="title-block">
+        <h1>Firma Digital</h1>
+        <div class="subtitle">Paso 5 de 5 · Conformidad</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%"></div></div>
+    <div class="screen-body">
+      <div class="card supervisor-card">
+        <div style="font-size:11px;color:var(--text-med);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">Inspector responsable</div>
+        <div class="sv-name" id="sign-inspector-name">—</div>
+        <div class="sv-info" id="sign-inspector-info">—</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">✍️ Firma de Conformidad</div>
+        <p style="font-size:12px;color:var(--text-med);margin-bottom:10px">
+          Trace su firma con el dedo en el área indicada. Al firmar confirma haber verificado los puntos evaluados.
+        </p>
+        <div class="sig-canvas-wrap">
+          <canvas id="sig-canvas" height="200"></canvas>
+          <div class="sig-hint" id="sig-hint">Firme aquí</div>
+          <button class="sig-clear-btn" id="btn-sig-clear">Borrar</button>
+        </div>
+      </div>
+
+      <div class="card" id="sign-summary-card" style="display:none">
+        <div class="card-title">📊 Resumen de Evaluación</div>
+        <div id="sign-summary-content"></div>
+      </div>
+    </div>
+    <div class="bottom-action">
+      <button id="btn-sign-submit" class="btn btn-success btn-block" style="font-size:15px">
+        ✅ Finalizar y Enviar Constancia
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ SCREEN 7: CONFIRMACIÓN ═══════════════════ -->
+  <div id="screen-confirm" class="screen">
+    <div class="screen-body" style="padding:0">
+      <div class="confirm-hero">
+        <div class="confirm-icon">✅</div>
+        <div class="confirm-title">¡Registro Completado!</div>
+        <div class="confirm-sub" id="confirm-id-text">Registro guardado exitosamente</div>
+      </div>
+      <div style="padding:16px">
+
+        <div class="card">
+          <div class="card-title">📧 Constancia Enviada A</div>
+          <div id="confirm-emails">—</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📁 Carpeta de Fotografías</div>
+          <p style="font-size:12px;color:var(--text-med);margin-bottom:8px">
+            Las evidencias fotográficas se organizaron en:
+          </p>
+          <div class="folder-chip" id="confirm-folder">—</div>
+          <p style="font-size:11px;color:var(--text-light);margin-top:4px">
+            El Excel consolidado con fotos adjuntas fue enviado a SSOMA.
+          </p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📊 Resumen del Registro</div>
+          <div id="confirm-summary">—</div>
+        </div>
+
+        <button id="btn-new-registro" class="btn btn-primary btn-block" style="margin-top:4px">
+          ➕ Nuevo Registro RC
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /#app -->
+
+<!-- ─── MODAL CÁMARA ──────────────────────────── -->
+<div id="cam-modal" class="modal-overlay">
+  <div class="modal-inner">
+    <div class="modal-title">
+      📷 Capturar Evidencia
+      <button class="modal-close" onclick="closeCamModal()">✕</button>
+    </div>
+    <video id="cam-video" autoplay playsinline muted></video>
+    <canvas id="cam-canvas"></canvas>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btn-cam-capture" class="btn btn-primary" style="flex:1">📸 Capturar Foto</button>
+      <label class="btn btn-outline" style="flex:1;text-align:center">
+        🖼️ Galería
+        <input id="file-gallery" type="file" accept="image/*" style="display:none">
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SPINNER ────────────────────────────────── -->
+<div id="spinner" class="spinner-wrap">
+  <div class="spinner"></div>
+  <div class="spinner-label" id="spinner-label">Procesando...</div>
+</div>
+
+<!-- ─── TOAST ──────────────────────────────────── -->
+<div id="toast" class="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── API BASE ─────────────────────────────────────────────
+const API = '';   // misma origin
+
+// ─── ESTADO GLOBAL ────────────────────────────────────────
+const app = {
+  token: localStorage.getItem('apprc_token') || null,
+  user:  JSON.parse(localStorage.getItem('apprc_user') || 'null'),
+  // Datos del registro en curso
+  registro: null,    // { id, rc_codigo, rc_nombre, ... }
+  rcCatalog: [],
+  rcSelected: null,  // RC completo con categorías
+  subpuntos: {},     // { [subpunto_id]: { respuesta, planAccion, responsableId, responsableNombre, fotoUrl } }
+  supervisores: [],
+  workers: [],       // trabajadores seleccionados
+  sigPainting: false,
+  sigCtx: null,
+  // cámara
+  camStream: null,
+  currentPhotoTarget: null, // { subpuntoId, tipo }
+};
+
+// ─── HELPERS ──────────────────────────────────────────────
+
+async function apiCall(method, path, body, isForm) {
+  const opts = {
+    method,
+    headers: { 'Authorization': `Bearer ${app.token}` },
+  };
+  if (body && !isForm) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(body);
+  } else if (body && isForm) {
+    opts.body = body;
+  }
+  const r = await fetch(API + path, opts);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+  return data;
+}
+
+function showSpinner(msg = 'Procesando...') {
+  document.getElementById('spinner-label').textContent = msg;
+  document.getElementById('spinner').classList.add('visible');
+}
+function hideSpinner() {
+  document.getElementById('spinner').classList.remove('visible');
+}
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function goTo(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('es-PE', { day:'2-digit', month:'short', year:'numeric' });
+}
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+// ─── AUTH ──────────────────────────────────────────────────
+
+async function init() {
+  if (app.token && app.user) {
+    try {
+      const me = await apiCall('GET', '/api/auth/me');
+      app.user = me;
+      localStorage.setItem('apprc_user', JSON.stringify(me));
+      showHomeScreen();
+    } catch {
+      doLogout(false);
+    }
+  } else {
+    goTo('screen-login');
+  }
+}
+
+function showHomeScreen() {
+  goTo('screen-header');
+  document.getElementById('hdr-inspector').value = app.user.nombre || '';
+  document.getElementById('hdr-fecha').value = todayISO();
+  resetRegistro();
+}
+
+function resetRegistro() {
+  app.registro = null;
+  app.rcSelected = null;
+  app.subpuntos = {};
+  app.workers = [];
+}
+
+document.getElementById('btn-login').addEventListener('click', doLogin);
+document.getElementById('login-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+async function doLogin() {
+  const correo   = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
+  const errEl    = document.getElementById('login-err');
+  errEl.style.display = 'none';
+
+  if (!correo || !password) {
+    document.getElementById('login-err-msg').textContent = 'Ingrese correo y contraseña.';
+    errEl.style.display = 'block';
+    return;
+  }
+  showSpinner('Verificando credenciales...');
+  try {
+    const data = await apiCall('POST', '/api/auth/login', { correo, password });
+    app.token = data.token;
+    app.user  = data.user;
+    localStorage.setItem('apprc_token', data.token);
+    localStorage.setItem('apprc_user', JSON.stringify(data.user));
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-pass').value  = '';
+    showHomeScreen();
+    showToast('¡Bienvenido, ' + data.user.nombre.split(',')[0] + '!', 'success');
+  } catch (err) {
+    document.getElementById('login-err-msg').textContent = err.message;
+    errEl.style.display = 'block';
+  } finally {
+    hideSpinner();
+  }
+}
+
+document.getElementById('btn-logout').addEventListener('click', () => {
+  if (confirm('¿Desea cerrar sesión?')) doLogout(true);
+});
+
+function doLogout(redirect = true) {
+  app.token = null;
+  app.user  = null;
+  localStorage.removeItem('apprc_token');
+  localStorage.removeItem('apprc_user');
+  resetRegistro();
+  if (redirect) goTo('screen-login');
+}
+
+// ─── PANTALLA CABECERA ─────────────────────────────────────
+
+document.getElementById('btn-hdr-next').addEventListener('click', async () => {
+  const gerencia = document.getElementById('hdr-gerencia').value;
+  const lugar    = document.getElementById('hdr-lugar').value.trim();
+  const tarea    = document.getElementById('hdr-tarea').value.trim();
+  const fecha    = document.getElementById('hdr-fecha').value;
+
+  if (!gerencia) { showToast('Seleccione una gerencia', 'error'); return; }
+  if (!lugar)    { showToast('Ingrese el lugar/ubicación', 'error'); return; }
+  if (!tarea)    { showToast('Ingrese la tarea evaluada', 'error'); return; }
+
+  // Guardar en estado para crear el registro después
+  app.headerData = { gerencia, lugar, tarea, fecha_registro: fecha || todayISO() };
+  await loadRCList();
+  goTo('screen-rc');
+});
+
+// ─── PANTALLA SELECCIÓN RC ─────────────────────────────────
+
+async function loadRCList() {
+  const container = document.getElementById('rc-list');
+  container.innerHTML = '<div class="empty-state"><div class="es-icon">⏳</div><p>Cargando catálogo...</p></div>';
+
+  try {
+    const list = await apiCall('GET', '/api/rc');
+    app.rcCatalog = list;
+    renderRCList(list);
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><div class="es-icon">⚠️</div><p>Error: ${err.message}</p></div>`;
+  }
+}
+
+function renderRCList(list) {
+  const container = document.getElementById('rc-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="empty-state"><div class="es-icon">📭</div><p>Sin resultados</p></div>';
+    return;
+  }
+  container.innerHTML = list.map(rc => `
+    <div class="rc-item" onclick="selectRC('${rc.code}')">
+      <div class="rc-badge">${rc.code}</div>
+      <div class="rc-item-name">${rc.name}</div>
+      <span style="color:var(--gray4);font-size:18px">›</span>
+    </div>
+  `).join('');
+}
+
+document.getElementById('rc-search').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  const filtered = app.rcCatalog.filter(rc =>
+    rc.code.toLowerCase().includes(q) || rc.name.toLowerCase().includes(q)
+  );
+  renderRCList(filtered);
+});
+
+async function selectRC(code) {
+  showSpinner('Cargando RC...');
+  try {
+    const rc = await apiCall('GET', '/api/rc/' + code);
+    app.rcSelected = rc;
+
+    // Crear registro en servidor
+    const reg = await apiCall('POST', '/api/registro', {
+      rcCodigo:      rc.code,
+      gerencia:      app.headerData.gerencia,
+      lugar:         app.headerData.lugar,
+      tarea:         app.headerData.tarea,
+      fechaRegistro: app.headerData.fecha_registro,
+    });
+    // El servidor devuelve { id, mensaje } o { registro: {...} }
+    app.registro = { id: reg.id || reg.registro?.id, rc_codigo: rc.code, rc_nombre: rc.name };
+    app.subpuntos = {};
+
+    // Inicializar estado local de subpuntos
+    for (const cat of rc.categories || []) {
+      for (const sp of cat.subpoints || []) {
+        app.subpuntos[sp.id] = { respuesta: null, planAccion: '', responsableId: null, responsableNombre: '', fotoUrl: null };
+      }
+    }
+
+    // Cargar supervisores para dropdown
+    const sups = await apiCall('GET', '/api/personal/supervisores');
+    app.supervisores = sups;
+
+    renderEvalScreen(rc);
+    goTo('screen-eval');
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    hideSpinner();
+  }
+}
+
+// ─── PANTALLA EVALUACIÓN ───────────────────────────────────
+
+function renderEvalScreen(rc) {
+  document.getElementById('eval-rc-title').textContent = rc.code + ' · ' + rc.name;
+  const body = document.getElementById('eval-body');
+
+  body.innerHTML = rc.categories.map((cat, ci) => `
+    <div class="category-block">
+      <div class="category-header">
+        <span class="cat-num">${cat.number}</span>
+        ${cat.name}
+      </div>
+      ${cat.subpoints.map(sp => renderSubpunto(sp, cat)).join('')}
+    </div>
+  `).join('');
+
+  updateEvalSummary();
+}
+
+function renderSubpunto(sp, cat) {
+  const state = app.subpuntos[sp.id] || {};
+  const r = state.respuesta;
+  return `
+    <div class="subpunto-row" id="sp-row-${sp.id}">
+      <div class="sp-header">
+        <div class="sp-num">${sp.n}</div>
+        <div class="sp-desc">${sp.desc}</div>
+        <div class="sp-required-badge">✱</div>
+      </div>
+      <div class="sp-buttons">
+        <button class="sp-btn ${r==='SI'?'active-si':''}" onclick="setRespuesta('${sp.id}','SI')">✓ Sí</button>
+        <button class="sp-btn ${r==='NO'?'active-no':''}" onclick="setRespuesta('${sp.id}','NO')">✗ No</button>
+        <button class="sp-btn ${r==='NA'?'active-na':''}" onclick="setRespuesta('${sp.id}','NA')">— N/A</button>
+      </div>
+      <div id="sp-details-${sp.id}" class="sp-details ${r==='NO'?'visible':''}">
+        ${r === 'NO' ? renderNoDetails(sp.id, state) : ''}
+      </div>
+      <div id="sp-si-section-${sp.id}" style="display:${r==='SI'?'block':'none'}">
+        <button class="sp-foto-btn ${state.fotoUrl?'has-photo':''}"
+                onclick="openCamModal('${sp.id}','ev')">
+          ${state.fotoUrl ? '✅ Foto capturada' : '📷 Agregar evidencia (opcional)'}
+        </button>
+        ${state.fotoUrl ? `<img src="${state.fotoUrl}" class="sp-foto-thumb" style="display:block">` : ''}
+      </div>
+    </div>
+  `;
+}
+
+function renderNoDetails(spId, state) {
+  const supOptions = app.supervisores.map(s =>
+    `<option value="${s.id}" ${state.responsableId===s.id?'selected':''}>${s.nombre} · ${s.cargo||''}</option>`
+  ).join('');
+  return `
+    <div class="form-group">
+      <label class="form-label">Responsable de Cumplimiento ✱</label>
+      <select class="form-control" id="sp-resp-${spId}" onchange="setResponsable('${spId}',this)">
+        <option value="">-- Seleccione supervisor responsable --</option>
+        ${supOptions}
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Acción / Plan de Acción ✱</label>
+      <textarea class="form-control" id="sp-plan-${spId}" rows="2"
+        placeholder="Describa la acción correctiva o plan a implementar..."
+        oninput="setPlan('${spId}',this.value)">${state.planAccion||''}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Observación (opcional)</label>
+      <input class="form-control" id="sp-obs-${spId}" type="text"
+        placeholder="Observación adicional..."
+        value="${state.observacion||''}"
+        oninput="setObservacion('${spId}',this.value)">
+    </div>
+    <button class="sp-foto-btn ${state.fotoUrl?'has-photo':''}"
+            onclick="openCamModal('${spId}','ev')">
+      ${state.fotoUrl ? '✅ Foto de evidencia capturada' : '📷 Foto de evidencia (recomendado)'}
+    </button>
+    ${state.fotoUrl ? `<img src="${state.fotoUrl}" class="sp-foto-thumb" style="display:block">` : ''}
+  `;
+}
+
+async function setRespuesta(spId, resp) {
+  const old = app.subpuntos[spId].respuesta;
+  app.subpuntos[spId].respuesta = resp;
+
+  // Re-render row
+  const rc = app.rcSelected;
+  let sp, cat;
+  for (const c of rc.categories) {
+    for (const s of c.subpoints) {
+      if (s.id === spId) { sp = s; cat = c; break; }
+    }
+    if (sp) break;
+  }
+  const row = document.getElementById('sp-row-' + spId);
+  if (row && sp) {
+    row.outerHTML = renderSubpunto(sp, cat);
+  }
+  updateEvalSummary();
+
+  // Guardar en servidor en background
+  try {
+    const d = app.subpuntos[spId];
+    await apiCall('PUT', `/api/registro/${app.registro.id}/subpunto`, {
+      subpuntoId: spId,
+      respuesta: resp,
+      planAccion: d.planAccion || '',
+      responsableId: d.responsableId || null,
+      observacion: d.observacion || '',
+    });
+  } catch (e) {
+    // silent - no bloquear UX
+  }
+}
+
+function setResponsable(spId, sel) {
+  const opt = sel.options[sel.selectedIndex];
+  app.subpuntos[spId].responsableId = sel.value;
+  app.subpuntos[spId].responsableNombre = opt.text;
+}
+
+function setPlan(spId, val) {
+  app.subpuntos[spId].planAccion = val;
+}
+
+function setObservacion(spId, val) {
+  app.subpuntos[spId].observacion = val;
+}
+
+function updateEvalSummary() {
+  const all = Object.values(app.subpuntos);
+  const si   = all.filter(s => s.respuesta === 'SI').length;
+  const no   = all.filter(s => s.respuesta === 'NO').length;
+  const na   = all.filter(s => s.respuesta === 'NA').length;
+  const pend = all.filter(s => !s.respuesta).length;
+  const total = all.length;
+
+  document.getElementById('eval-summary').innerHTML = `
+    <div class="eval-pill pend">⏳ Pendientes: ${pend}/${total}</div>
+    <div class="eval-pill si">✓ Sí: ${si}</div>
+    <div class="eval-pill no">✗ No: ${no}</div>
+    <div class="eval-pill na">— N/A: ${na}</div>
+  `;
+}
+
+document.getElementById('btn-eval-next').addEventListener('click', async () => {
+  // Validar que todos los subpuntos tengan respuesta
+  const all = Object.values(app.subpuntos);
+  const pend = all.filter(s => !s.respuesta).length;
+  if (pend > 0) {
+    showToast(`Faltan ${pend} subpunto(s) por responder`, 'error');
+    // Scroll al primero sin respuesta
+    const spId = Object.keys(app.subpuntos).find(k => !app.subpuntos[k].respuesta);
+    document.getElementById('sp-row-' + spId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  // Validar "No" tienen responsable y plan
+  const nos = Object.entries(app.subpuntos).filter(([,v]) => v.respuesta === 'NO');
+  for (const [spId, v] of nos) {
+    if (!v.responsableId) {
+      showToast('Asigne responsable en todos los "No cumple"', 'error');
+      document.getElementById('sp-row-' + spId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (!v.planAccion.trim()) {
+      showToast('Complete el plan de acción en todos los "No cumple"', 'error');
+      document.getElementById('sp-row-' + spId)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+
+  // Guardar todos los subpuntos al servidor
+  showSpinner('Guardando evaluación...');
+  try {
+    for (const [spId, v] of Object.entries(app.subpuntos)) {
+      if (v.respuesta) {
+        await apiCall('PUT', `/api/registro/${app.registro.id}/subpunto`, {
+          subpuntoId: spId,
+          respuesta: v.respuesta,
+          planAccion: v.planAccion || '',
+          responsableId: v.responsableId || null,
+          observacion: v.observacion || '',
+        });
+      }
+    }
+    goTo('screen-workers');
+    renderWorkerScreen();
+  } catch (err) {
+    showToast('Error guardando: ' + err.message, 'error');
+  } finally {
+    hideSpinner();
+  }
+});
+
+// ─── CÁMARA / FOTOS ────────────────────────────────────────
+
+function openCamModal(spId, tipo) {
+  app.currentPhotoTarget = { spId, tipo };
+  document.getElementById('cam-modal').classList.add('visible');
+  startCamera();
+}
+
+function closeCamModal() {
+  document.getElementById('cam-modal').classList.remove('visible');
+  stopCamera();
+}
+
+async function startCamera() {
+  stopCamera();
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    app.camStream = stream;
+    const vid = document.getElementById('cam-video');
+    vid.srcObject = stream;
+  } catch (err) {
+    document.getElementById('cam-video').style.display = 'none';
+    showToast('Cámara no disponible. Use galería.', 'warn');
+  }
+}
+
+function stopCamera() {
+  if (app.camStream) {
+    app.camStream.getTracks().forEach(t => t.stop());
+    app.camStream = null;
+  }
+}
+
+document.getElementById('btn-cam-capture').addEventListener('click', () => {
+  const vid = document.getElementById('cam-video');
+  const canvas = document.getElementById('cam-canvas');
+  canvas.width  = vid.videoWidth  || 640;
+  canvas.height = vid.videoHeight || 480;
+  canvas.getContext('2d').drawImage(vid, 0, 0);
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+  handlePhoto(dataUrl);
+});
+
+document.getElementById('file-gallery').addEventListener('change', function() {
+  const file = this.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => handlePhoto(e.target.result);
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+async function handlePhoto(dataUrl) {
+  closeCamModal();
+  if (!app.currentPhotoTarget) return;
+  const { spId, tipo } = app.currentPhotoTarget;
+
+  showSpinner('Subiendo foto...');
+  try {
+    const data = await apiCall('POST', '/api/upload-base64', {
+      registroId: app.registro.id,
+      subpuntoId: spId,
+      tipo,
+      base64: dataUrl.split(',')[1],
+      ext: 'jpg',
+    });
+    app.subpuntos[spId].fotoUrl = data.url;
+
+    // Actualizar evidencia en servidor
+    await apiCall('PUT', `/api/registro/${app.registro.id}/evidencia`, {
+      subpuntoId: spId,
+      evidenciaUrl: data.url,
+      evidenciaTipo: 'foto',
+    });
+
+    // Refrescar sección del subpunto
+    const rc = app.rcSelected;
+    let sp, cat;
+    for (const c of rc.categories) {
+      for (const s of c.subpoints) { if (s.id === spId) { sp = s; cat = c; break; } }
+      if (sp) break;
+    }
+    if (sp) {
+      document.getElementById('sp-row-' + spId).outerHTML = renderSubpunto(sp, cat);
+    }
+    showToast('Foto guardada', 'success');
+  } catch (err) {
+    showToast('Error subiendo foto: ' + err.message, 'error');
+  } finally {
+    hideSpinner();
+  }
+}
+
+// ─── PANTALLA TRABAJADORES ─────────────────────────────────
+
+function renderWorkerScreen() {
+  renderWorkerList();
+  document.getElementById('worker-results').style.display = 'none';
+  document.getElementById('worker-results').innerHTML = '';
+  document.getElementById('worker-search').value = '';
+}
+
+function renderWorkerList() {
+  const list = document.getElementById('worker-list');
+  const count = document.getElementById('worker-count');
+  count.textContent = app.workers.length;
+
+  if (!app.workers.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><div class="es-icon">👷</div><p>Busque y agregue trabajadores</p></div>';
+    return;
+  }
+  list.innerHTML = app.workers.map(w => `
+    <div class="worker-chip">
+      <div>
+        <div class="wc-name">${w.nombre}</div>
+        <div class="wc-info">${w.cargo || ''} · DNI: ${w.dni}</div>
+      </div>
+      <button class="wc-remove" onclick="removeWorker('${w.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+document.getElementById('btn-worker-search').addEventListener('click', searchWorkers);
+document.getElementById('worker-search').addEventListener('keydown', e => { if (e.key === 'Enter') searchWorkers(); });
+
+async function searchWorkers() {
+  const q = document.getElementById('worker-search').value.trim();
+  if (!q) { showToast('Ingrese nombre o DNI a buscar', 'warn'); return; }
+
+  try {
+    const list = await apiCall('GET', `/api/personal?q=${encodeURIComponent(q)}`);
+    const resultsEl = document.getElementById('worker-results');
+    if (!list.length) {
+      resultsEl.innerHTML = '<div style="padding:12px;text-align:center;font-size:13px;color:var(--text-light)">Sin resultados</div>';
+    } else {
+      resultsEl.innerHTML = list.map(w => `
+        <div class="worker-result-item" onclick="addWorker(${JSON.stringify(w).replace(/"/g,'&quot;')})">
+          <div>
+            <div class="w-name">${w.nombre}</div>
+            <div class="w-info">${w.cargo || '—'} · ${w.agrupador || ''} · DNI: ${w.dni}</div>
+          </div>
+          <span style="color:var(--primary-light);font-size:18px">+</span>
+        </div>
+      `).join('');
+    }
+    resultsEl.style.display = 'block';
+  } catch (err) {
+    showToast('Error buscando: ' + err.message, 'error');
+  }
+}
+
+function addWorker(w) {
+  if (app.workers.find(x => x.id === w.id)) {
+    showToast('Trabajador ya agregado', 'warn');
+    return;
+  }
+  app.workers.push(w);
+  document.getElementById('worker-results').style.display = 'none';
+  document.getElementById('worker-search').value = '';
+  renderWorkerList();
+  showToast(w.nombre.split(',')[0] + ' agregado', 'success');
+}
+
+function removeWorker(id) {
+  app.workers = app.workers.filter(w => w.id !== id);
+  renderWorkerList();
+}
+
+document.getElementById('btn-workers-next').addEventListener('click', async () => {
+  if (app.workers.length < 1) {
+    showToast('Agregue al menos 1 trabajador', 'error');
+    return;
+  }
+  showSpinner('Guardando trabajadores...');
+  try {
+    await apiCall('POST', `/api/registro/${app.registro.id}/trabajadores`, {
+      trabajadores: app.workers,
+    });
+    prepareSignScreen();
+    goTo('screen-sign');
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error');
+  } finally {
+    hideSpinner();
+  }
+});
+
+// ─── PANTALLA FIRMA ────────────────────────────────────────
+
+function prepareSignScreen() {
+  // Inspector = usuario logueado
+  document.getElementById('sign-inspector-name').textContent = app.user.nombre;
+  document.getElementById('sign-inspector-info').textContent =
+    (app.user.cargo || '') + ' · ' + (app.user.agrupador || '') + ' · DNI: ' + app.user.dni;
+
+  // Resumen evaluación
+  const all = Object.values(app.subpuntos);
+  const si  = all.filter(s => s.respuesta === 'SI').length;
+  const no  = all.filter(s => s.respuesta === 'NO').length;
+  const na  = all.filter(s => s.respuesta === 'NA').length;
+  const noItems = Object.entries(app.subpuntos).filter(([,v]) => v.respuesta === 'NO');
+
+  const summaryEl = document.getElementById('sign-summary-content');
+  document.getElementById('sign-summary-card').style.display = 'block';
+
+  summaryEl.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <div style="flex:1;text-align:center;padding:10px;background:var(--success-bg);border-radius:8px">
+        <div style="font-size:22px;font-weight:800;color:var(--success)">${si}</div>
+        <div style="font-size:11px;color:var(--success)">CUMPLE</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--danger-bg);border-radius:8px">
+        <div style="font-size:22px;font-weight:800;color:var(--danger)">${no}</div>
+        <div style="font-size:11px;color:var(--danger)">NO CUMPLE</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:10px;background:var(--na-bg);border-radius:8px">
+        <div style="font-size:22px;font-weight:800;color:var(--na)">${na}</div>
+        <div style="font-size:11px;color:var(--na)">N/A</div>
+      </div>
+    </div>
+    ${no > 0 ? `
+      <div style="font-size:12px;font-weight:700;color:var(--danger);margin-bottom:6px">
+        ⚠️ ${no} subpunto(s) NO cumplen — se enviarán notificaciones a responsables
+      </div>
+      ${noItems.map(([id,v]) => `
+        <div style="font-size:12px;padding:6px 8px;background:var(--danger-bg);border-radius:5px;margin-bottom:4px">
+          <strong>${id}</strong> → ${v.responsableNombre || 'Sin responsable'}: ${v.planAccion}
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+
+  // Init canvas firma
+  initSigCanvas();
+}
+
+function initSigCanvas() {
+  const canvas = document.getElementById('sig-canvas');
+  const ctx = canvas.getContext('2d');
+  app.sigCtx = ctx;
+
+  // Set canvas width
+  canvas.width  = canvas.offsetWidth || 380;
+  canvas.height = 200;
+
+  ctx.strokeStyle = '#1a1a2e';
+  ctx.lineWidth   = 2.5;
+  ctx.lineCap     = 'round';
+  ctx.lineJoin    = 'round';
+
+  clearSig();
+
+  // Touch
+  canvas.addEventListener('touchstart', sigStart, { passive: false });
+  canvas.addEventListener('touchmove',  sigMove,  { passive: false });
+  canvas.addEventListener('touchend',   sigEnd);
+  // Mouse
+  canvas.addEventListener('mousedown', sigStartM);
+  canvas.addEventListener('mousemove', sigMoveM);
+  canvas.addEventListener('mouseup',   sigEnd);
+  canvas.addEventListener('mouseleave', sigEnd);
+}
+
+function sigGetPos(canvas, e) {
+  const r = canvas.getBoundingClientRect();
+  const src = e.touches ? e.touches[0] : e;
+  return {
+    x: (src.clientX - r.left) * (canvas.width  / r.width),
+    y: (src.clientY - r.top)  * (canvas.height / r.height),
+  };
+}
+
+function sigStart(e) {
+  e.preventDefault();
+  app.sigPainting = true;
+  const p = sigGetPos(e.target, e);
+  app.sigCtx.beginPath();
+  app.sigCtx.moveTo(p.x, p.y);
+  document.getElementById('sig-hint').style.opacity = '0';
+}
+function sigMove(e) {
+  e.preventDefault();
+  if (!app.sigPainting) return;
+  const p = sigGetPos(e.target, e);
+  app.sigCtx.lineTo(p.x, p.y);
+  app.sigCtx.stroke();
+}
+function sigEnd() { app.sigPainting = false; }
+function sigStartM(e) {
+  app.sigPainting = true;
+  const p = sigGetPos(e.target, e);
+  app.sigCtx.beginPath();
+  app.sigCtx.moveTo(p.x, p.y);
+  document.getElementById('sig-hint').style.opacity = '0';
+}
+function sigMoveM(e) {
+  if (!app.sigPainting) return;
+  const p = sigGetPos(e.target, e);
+  app.sigCtx.lineTo(p.x, p.y);
+  app.sigCtx.stroke();
+}
+
+function clearSig() {
+  const canvas = document.getElementById('sig-canvas');
+  app.sigCtx.clearRect(0, 0, canvas.width, canvas.height);
+  app.sigCtx.fillStyle = '#f8f9fa';
+  app.sigCtx.fillRect(0, 0, canvas.width, canvas.height);
+  document.getElementById('sig-hint').style.opacity = '1';
+}
+document.getElementById('btn-sig-clear').addEventListener('click', clearSig);
+
+function isSigEmpty() {
+  const canvas = document.getElementById('sig-canvas');
+  const ctx = canvas.getContext('2d');
+  const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+  // Check if any pixel differs from background (248,249,250 = #f8f9fa)
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i] < 240 || data[i+1] < 241 || data[i+2] < 241) return false;
+  }
+  return true;
+}
+
+document.getElementById('btn-sign-submit').addEventListener('click', submitRegistro);
+
+async function submitRegistro() {
+  if (isSigEmpty()) {
+    showToast('Trace su firma en el área indicada', 'error');
+    return;
+  }
+
+  const canvas = document.getElementById('sig-canvas');
+  const firmaBase64 = canvas.toDataURL('image/png').split(',')[1];
+
+  showSpinner('Finalizando registro y enviando correos...');
+  try {
+    // Guardar firma
+    await apiCall('POST', `/api/registro/${app.registro.id}/firma`, {
+      firmaBase64,
+    });
+
+    // Finalizar — genera Excel y envía correos
+    const result = await apiCall('POST', `/api/registro/${app.registro.id}/finalizar`);
+
+    showConfirmScreen(result);
+    goTo('screen-confirm');
+  } catch (err) {
+    showToast('Error al finalizar: ' + err.message, 'error');
+  } finally {
+    hideSpinner();
+  }
+}
+
+// ─── PANTALLA CONFIRMACIÓN ─────────────────────────────────
+
+function showConfirmScreen(result) {
+  const reg = result.registro || app.registro;
+
+  // ID del registro
+  document.getElementById('confirm-id-text').textContent =
+    `Registro ${reg.id ? reg.id.slice(0,8).toUpperCase() : ''} · ${reg.rc_codigo || app.registro.rc_codigo}`;
+
+  // Emails — el servidor puede devolver emailsEnviados (strings) o correos_enviados (objects)
+  const rawEmails = result.emailsEnviados || result.correos_enviados || [];
+  const emailsEl = document.getElementById('confirm-emails');
+  if (rawEmails.length) {
+    emailsEl.innerHTML = rawEmails.map(em => {
+      const correo = typeof em === 'string' ? em : em.correo;
+      const nombre = typeof em === 'object' ? (em.nombre || em.correo) : em;
+      const rol    = typeof em === 'object' ? (em.rol || 'Destinatario') : 'Destinatario';
+      return `
+        <div class="email-chip">
+          <div class="em-icon">✉️</div>
+          <div>
+            <div class="em-name">${nombre}</div>
+            <div class="em-addr">${correo !== nombre ? correo + ' · ' : ''}${rol}</div>
+          </div>
+        </div>`;
+    }).join('');
+  } else if (result.emailConfigured === false) {
+    emailsEl.innerHTML = `
+      <div class="email-chip">
+        <div class="em-icon">📝</div>
+        <div>
+          <div class="em-name">Constancia guardada localmente</div>
+          <div class="em-addr">Configure SMTP_USER y SMTP_PASS para activar envíos</div>
+        </div>
+      </div>
+    `;
+  } else {
+    emailsEl.innerHTML = `<div class="email-chip"><div class="em-icon">✅</div><div><div class="em-name">Correos enviados</div></div></div>`;
+  }
+
+  // Carpeta fotos
+  const fecha = (app.headerData?.fecha_registro || todayISO());
+  const rcCode = app.registro.rc_codigo;
+  const regId  = app.registro.id ? app.registro.id.slice(0,8).toUpperCase() : 'ID';
+  document.getElementById('confirm-folder').textContent =
+    `AppRC/${fecha}/${rcCode}/${rcCode}-${regId}/`;
+
+  // Resumen
+  const all = Object.values(app.subpuntos);
+  const si  = all.filter(s => s.respuesta === 'SI').length;
+  const no  = all.filter(s => s.respuesta === 'NO').length;
+  const na  = all.filter(s => s.respuesta === 'NA').length;
+  const photos = all.filter(s => s.fotoUrl).length;
+
+  document.getElementById('confirm-summary').innerHTML = `
+    <div class="summary-bar">
+      <div class="summary-item">🗓️ <strong>${fmtDate(fecha)}</strong></div>
+      <div class="summary-item">📍 <strong>${app.headerData?.lugar || '—'}</strong></div>
+      <div class="summary-item">👷 <strong>${app.workers.length} trabajadores</strong></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;text-align:center;padding:8px;background:var(--success-bg);border-radius:8px">
+        <div style="font-size:20px;font-weight:800;color:var(--success)">${si}</div>
+        <div style="font-size:10px;color:var(--success)">CUMPLE</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px;background:var(--danger-bg);border-radius:8px">
+        <div style="font-size:20px;font-weight:800;color:var(--danger)">${no}</div>
+        <div style="font-size:10px;color:var(--danger)">NO CUMPLE</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px;background:var(--na-bg);border-radius:8px">
+        <div style="font-size:20px;font-weight:800;color:var(--na)">${na}</div>
+        <div style="font-size:10px;color:var(--na)">N/A</div>
+      </div>
+      <div style="flex:1;text-align:center;padding:8px;background:#e8f4fd;border-radius:8px">
+        <div style="font-size:20px;font-weight:800;color:var(--primary-light)">${photos}</div>
+        <div style="font-size:10px;color:var(--primary-light)">FOTOS</div>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById('btn-new-registro').addEventListener('click', () => {
+  // Reset estado
+  resetRegistro();
+  document.getElementById('hdr-gerencia').value = '';
+  document.getElementById('hdr-lugar').value = '';
+  document.getElementById('hdr-tarea').value = '';
+  document.getElementById('hdr-fecha').value = todayISO();
+  goTo('screen-header');
+  showToast('Listo para nuevo registro', 'success');
+});
+
+// ─── ARRANQUE ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', init);
+
+// Cerrar modal al tocar overlay
+document.getElementById('cam-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeCamModal();
+});
+
+// Prevent zoom en doble tap en móvil
+let lastTap = 0;
+document.addEventListener('touchend', function(e) {
+  const now = Date.now();
+  if (now - lastTap < 300) e.preventDefault();
+  lastTap = now;
+}, { passive: false });
+
+</script>
+</body>
+</html>
